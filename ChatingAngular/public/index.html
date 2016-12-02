@@ -1,0 +1,227 @@
+<html ng-app="chatApp">
+	<head>
+		<title>Chat with socket.io and node.js</title>
+		<style>
+			*{
+				padding:0;
+				margin:0;
+			}
+			#chat{
+				height: 500px;
+				width: 160px;
+			}
+			.srcMsgText{
+				
+				text-align: right;
+				margin:4px;
+				margin-left: 16px;
+				color: white;
+			}
+			.dstMsgText{
+				
+				text-align: left;
+				margin: 4px;
+				margin-right: 16px;
+				color: white;
+			}
+			#contentWrap{
+				float: right;
+				height: 500px;
+				width: 190px;
+				border: 1px solid;
+				text-align: center;
+				background-color:#BDBF15;
+				overflow-y: auto;
+			}
+			#chatWrap{
+				float:left;
+				border: 1px solid black;
+			}
+			#self{
+				text-align: right;
+			}
+			#other{
+				text-align: left;
+			}
+			.error{
+				color:red;
+			}
+			.whisper{
+				color:gray;
+				font-style: italic;
+			}
+			#users{
+				/* width: inherit; */
+				position: absolute;
+				width: 160px;
+				left: 350px;
+			}
+			.userPara{
+				    margin: 0;
+					margin-left: 1px;
+					/* margin-top: 5px; */
+					padding: 0;
+					display: inline-block;
+			}
+			#socketUser{
+				color:blue;
+			}
+			.singleChat{
+				overflow-y:auto;
+			}
+			.singleChat p{
+				font-size: 14px;
+				/*border: 1px solid #fff;*/
+				color: #fff;
+				padding:6px;
+				height:25px;
+				font-family: Arial,"Arial Regular";
+				cursor: pointer;
+				width: 128px;
+    			text-align: left;
+				text-transform: capitalize;
+				display: inline-block;
+			}
+			.chatRoom{
+				
+				    width: 268px;
+					float: right;
+					border: 2px solid black;
+					margin-right:10px;
+			}
+			.chatClub{
+				overflow: hidden;
+			}
+			.chatUser{
+				
+				color: #fff;
+				background-color: #000;
+				/* height: 10px; */
+				font-size: 16px;
+				margin: 0;
+				padding: 0;
+				padding: 5px;
+				text-align: center;
+				text-transform: capitalize;
+			}
+			.chatMsg{
+				height: 285px;
+				color:#000;
+				overflow-y:auto;
+			}
+			#send-message{
+				margin-bottom:5px;
+			}
+			#submit{
+				margin-left: 8px;
+			}
+			.imageDestMsg{
+				
+				width:100px;
+				float:left;
+				margin:4px;
+				border:1px solid;
+				border-color:green;
+			}
+			.imageSrcMsg{
+				
+				width:100px;
+				float:right;
+				margin:4px;
+				border:1px solid;
+				border-color:green;
+			}
+			.zoomIMage{
+				
+				width: 500px;
+				float: none;
+				margin: auto;
+			}
+			.zoomParentClass{
+				
+				position: relative;
+				overflow: none;
+				/* width: 500px; */
+				top:0;
+				left:0;
+			}
+			.srcMsgDiv{
+				
+				float: right;
+				width: 165px;
+				margin-left: 3px;
+				border-radius: 25px 0px 0px 25px;
+				background-color: darkgray;
+				word-break: break-all;
+				margin-top: 5px;
+			}
+			.desMsgDiv{
+				
+				width: 165px;
+				float: left;
+				margin-left: 3px;
+				border-radius: 0px 25px 25px 0px;
+				background-color: burlywood;
+				word-break: break-all;
+				margin-top:5px;
+			}
+			input[type = "file"]{
+				opacity: 0;
+				display: block;
+				width: 30px;
+				height: 23px;
+			}
+			.browseImgCOntainer{
+				background: url('images/download.png') no-repeat;
+				background-size: contain;
+				display: block;
+				position: relative;
+			}
+			.online{
+					border-radius: 21px;
+					width: 14px;
+					height: 13px;
+					background-color: green;
+					display: inline-block;
+			}
+			.offline{
+					border-radius: 21px;
+					width: 14px;
+					height: 13px;
+					background-color: #e4e4e4;
+					display: inline-block;
+			}
+			.loginUser{
+				    text-transform: capitalize;
+					font-weight: bold;
+					font-size: 17px;
+					text-decoration: underline;
+			}
+		</style>
+		
+	</head>
+	<body ng-controller="chatController">
+		<div id="nickWrap" ng-if="loginContainer">
+			<p>Enter a username</p>
+			<p id="nickError"></p>
+			<form id="setNick">
+				<input size="35" ng-model="userName" id="nickname"/>
+				<input type="submit" ng-click="submitClick()"/>
+			</form>
+		</div>
+		<div class="chatClub" ng-if="showChatContainer">
+			<div id ="contentWrap">
+				<div class="loginUser">{{userName}}</div>
+				<div class="singleChat" ng-click="createChatRoom(user.login)" ng-repeat=" user in users">
+					<!--<p>{{user}}</p>-->
+					<div class="{{user.status}}"></div>
+					<p>{{user.login }}</p>
+				</div>
+			</div>
+		</div>
+		<script src="vendors/jquery-1.9.0.min.js"></script>
+		<script src="vendors/angular.js"></script> 
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="js/controllers/chatController.js"></script>
+	</body>
+</html>

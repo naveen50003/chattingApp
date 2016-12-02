@@ -1,0 +1,135 @@
+<html>
+	<head>
+		<title>Chat with socket.io and node.js</title>
+		<style>
+			#chat{
+				height: 500px;
+			}
+			#contentWrap{
+				display: none;
+			}
+			#chatWrap{
+				float:left;
+				border: 1px solid black;
+			}
+			#self{
+				text-align: right;
+			}
+			#other{
+				text-align: left;
+			}
+			.error{
+				color:red;
+			}
+			.whisper{
+				color:gray;
+				font-style: italic;
+			}
+			.online{
+					border-radius: 21px;
+					width: 14px;
+					height: 13px;
+					background-color: green;
+					display: inline-block;
+			}
+			.offline{
+					border-radius: 21px;
+					width: 14px;
+					height: 13px;
+					background-color: #e4e4e4;
+					display: inline-block;
+			}
+			#users{
+				/* width: inherit; */
+				position: absolute;
+				width: 160px;
+				left: 350px;
+			}
+			.userPara{
+				    margin: 0;
+					margin-left: 1px;
+					/* margin-top: 5px; */
+					padding: 0;
+					display: inline-block;
+			}
+			#socketUser{
+				color:blue;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="nickWrap">
+			<p>Enter a username</p>
+			<p id="nickError"></p>
+			<form id="setNick">
+				<input size="35" id="nickname"/>
+				<input type="submit"/>
+			</form>
+		</div>
+		<div id ="contentWrap">
+			<div id="chatWrap">
+				<div id="chat"></div>
+				<form id="send-message">
+					<input size="35" id="message"/>
+					<input type="submit"/>
+				</form>
+			</div>
+			<div id="users"></div>
+		</div>
+		<script src="vendors/jquery-1.9.0.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			jQuery(function($){
+				var socket	= io.connect();
+				var $messageForm	=	$('#send-message');
+				var $messageBox	=	$('#message');
+				var $chat	= $('#chat');
+				var $nickForm	=	$('#setNick');
+				var $nickError	=	$('#nickError');
+				var $nickBox	=	$('#nickname');
+				var	$users	= 	$('#users');
+				$nickForm.submit(function(e){
+					e.preventDefault();
+					socket.emit('new user',$nickBox.val(),function(data){
+						console.log(data);
+						if(data){
+							if( data === "user Exists")
+								$nickError.html("user already exists ...try again");
+							else{
+								$('#nickWrap').hide();
+								$('#contentWrap').show();
+							}
+						}else{
+							// $nickError.html("user already exists ...try again");
+							$('#nickWrap').hide();
+							$('#contentWrap').show();
+						}
+					})
+					$nickBox.val('');
+				})
+				socket.on("usernames",function(data){
+					console.log("entered usernames on function at client side");
+					var html = '';
+					for(i=0;i<data.length;i++){
+						html +="<div class='"+data[i].status+"'></div><p class='userPara'>"+data[i].login +"</p></br>";
+					}
+					$users.html(html);
+				})
+				$messageForm.submit(function(e){
+					e.preventDefault();
+					socket.emit('send message',$messageBox.val(),function(data){
+						$chat.append("<span class='error'><b>"+data+"</p><span><br/>");
+					});
+					$messageBox.val('');
+				});
+				
+				socket.on('new message',function(data){
+					console.log(data);
+					$chat.append("<p id='"+data.typeOfUser+"'><b>"+data.user+":"+data.msg + "<br/></p>");
+				});
+				
+				socket.on('whisper',function(data){
+					$chat.append("<p id='"+data.typeOfUser+"'><b>"+data.user+":"+data.msg + "<br/></p>");
+				})
+			});
+		</script> 
